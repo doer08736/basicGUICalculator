@@ -71,7 +71,7 @@ double popOperand(){
     return num;
 }
 
-double infix_eval(){
+double infixEval(){
     char op = popOperator();
     double x = popOperand(), y = popOperand();
     
@@ -123,10 +123,10 @@ void evaluate(char *expr){
                 !isEmpty('r') && 
                 (precedence(ch)<=precedence(topOperator->data))
             )
-                pushOperand(infix_eval());
+                pushOperand(infixEval());
             pushOperator(ch);
         }
     }
     while(!isEmpty('r'))
-        pushOperand(infix_eval());
+        pushOperand(infixEval());
 }
