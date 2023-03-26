@@ -1,0 +1,4 @@
+# unwanted stuffs
+*.exe
+*.out
+*.vscode
