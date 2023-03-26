@@ -12,7 +12,7 @@ unsigned short int flag = 0;
 typedef struct{
     GtkWidget *window;
     GtkWidget *grid;
-    GtkWidget *button[20];
+    GtkWidget *button[19];
 }calculator;
 
 
