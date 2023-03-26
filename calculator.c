@@ -164,7 +164,7 @@ void addButton(){
         widget.button[i] = gtk_button_new_with_label(ops[i]);
 }
 
-void attachButton(GtkWidget *box){
+void attachButton(){
     gtk_grid_attach(GTK_GRID(widget.grid), box, 0, 0, 4, 1);
     gtk_grid_attach(GTK_GRID(widget.grid), widget.button[10], 0, 1, 1, 1);
     gtk_grid_attach(GTK_GRID(widget.grid), widget.button[11], 1, 1, 1, 1);
@@ -206,7 +206,7 @@ void activate(GtkApplication *app, gpointer user_data){
     gtk_container_add(GTK_CONTAINER(widget.window), widget.grid);
     
     addButton();
-    attachButton(box);
+    attachButton();
     connectClickedSignal();
 
     gtk_widget_show_all(widget.window);
