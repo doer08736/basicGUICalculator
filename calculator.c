@@ -59,14 +59,14 @@ void compute(){
     evaluate(expr);
     sprintf(str, "%.2f", topOperand->data);
     gtk_entry_set_text(GTK_ENTRY(box), str);
-    strcpy(expr, str);
+    strncpy(expr, str, sizeof(expr));
 }
 
 void handleButtonClick(GtkButton *button, gpointer user_data){
     const gchar *text = gtk_button_get_label(button);
 
-    char lastChar = *(expr+(strlen(expr)-1));
     char exprLen = strlen(expr);
+    char lastChar = *(expr+(exprLen-1));
 
     if((strcmp("C", text)==0))
         clearExpr();
@@ -142,7 +142,7 @@ void handleButtonClick(GtkButton *button, gpointer user_data){
             dot = 1;
         if(isOperator(text[0]))
             dot = 0;
-        strcat(expr, text);
+        strncat(expr, text, 30-exprLen);
         showExpr();
     }
 
@@ -150,7 +150,7 @@ void handleButtonClick(GtkButton *button, gpointer user_data){
         backspace();
 
     else{
-        if(isOperator(*(expr+(strlen(expr)-1)))){
+        if(isOperator(*(expr+(exprLen-1)))){
             flag = 1;
             gtk_entry_set_text(GTK_ENTRY(box), "super wrong exp!! (Press C)");
             return;
