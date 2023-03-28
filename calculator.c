@@ -54,6 +54,65 @@ unsigned short int superWrong(){
     return 0;
 }
 
+unsigned short int clearClicked(const gchar *text){
+    return strcmp("C", text)==0;
+}
+
+unsigned short int backspaceClicked(const gchar *text){
+    return strcmp("⌫", text)==0;
+}
+
+unsigned short int backToBackDot(const gchar *text){
+    return *(text)=='.' && dot;
+}
+
+unsigned short int sameOperatorAgain(const gchar *text, char lastChar){
+    return isOperator(*(text)) && lastChar==*(text);
+}
+
+unsigned short int invalidFirstInput(const gchar *text, char exprLen){
+    return exprLen==0 && (
+        *(text)=='+' ||
+        *(text)=='=' ||
+        *(text)=='/' || 
+        *(text)=='x' || 
+        *(text)=='%'
+    );
+}
+
+unsigned short int invalidOperation(const gchar *text, char exprLen, char lastChar){
+    return exprLen && (
+        lastChar=='+' && *(text)=='-' ||
+        lastChar=='+' && *(text)=='x' ||
+        lastChar=='+' && *(text)=='/' ||
+        lastChar=='+' && *(text)=='%' ||
+        lastChar=='-' && *(text)=='+' ||
+        lastChar=='-' && *(text)=='x' ||
+        lastChar=='-' && *(text)=='/' ||
+        lastChar=='-' && *(text)=='%' ||
+        lastChar=='x' && *(text)=='+' || 
+        lastChar=='x' && *(text)=='/' || 
+        lastChar=='x' && *(text)=='%' || 
+        lastChar=='/' && *(text)=='+' || 
+        lastChar=='/' && *(text)=='x' || 
+        lastChar=='/' && *(text)=='%' || 
+        lastChar=='%' && *(text)=='+' || 
+        lastChar=='%' && *(text)=='x' ||  
+        lastChar=='%' && *(text)=='/' ||   
+        lastChar=='%' && *(text)=='-'   
+    );
+}
+
+unsigned short int validOperatorOrOperand(const gchar *text, char exprLen){
+    return isdigit(*(text)) || 
+        strcmp("%", text)==0 ||
+        strcmp("/", text)==0 ||
+        strcmp("x", text)==0 ||
+        strcmp("-", text)==0 ||
+        strcmp("+", text)==0 ||
+        strcmp(".", text)==0;
+}
+
 void compute(){
     char str[30];
     evaluate(expr);
@@ -68,85 +127,37 @@ void handleButtonClick(GtkButton *button, gpointer user_data){
     char exprLen = strlen(expr);
     char lastChar = *(expr+(exprLen-1));
 
-    if((strcmp("C", text)==0))
+    if(clearClicked(text))
         clearExpr();
-    
-    else if(
-        isOperator(text[0]) && 
-        lastChar==text[0]
-    )
-        return;
-    
-    else if(
-        exprLen==0 &&
-        (
-            text[0]=='+' ||
-            text[0]=='=' ||
-            text[0]=='/' || 
-            text[0]=='x' || 
-            text[0]=='%'
-        )
-    )
-        return;
 
-    else if(
-        exprLen &&
-        (
-            lastChar=='+' && text[0]=='-' ||
-            lastChar=='+' && text[0]=='x' ||
-            lastChar=='+' && text[0]=='/' ||
-            lastChar=='+' && text[0]=='%' ||
-            lastChar=='-' && text[0]=='+' ||
-            lastChar=='-' && text[0]=='x' ||
-            lastChar=='-' && text[0]=='/' ||
-            lastChar=='-' && text[0]=='%' ||
-            lastChar=='x' && text[0]=='+' || 
-            lastChar=='x' && text[0]=='/' || 
-            lastChar=='x' && text[0]=='%' || 
-            lastChar=='/' && text[0]=='+' || 
-            lastChar=='/' && text[0]=='x' || 
-            lastChar=='/' && text[0]=='%' || 
-            lastChar=='%' && text[0]=='+' || 
-            lastChar=='%' && text[0]=='x' ||  
-            lastChar=='%' && text[0]=='/' ||   
-            lastChar=='%' && text[0]=='-'   
-        )
-    )
-        return;
-
-    else if(
-        text[0]=='.' && dot
-    )
+    else if(superWrong())
         return;
 
     else if(checkStackSmash())
         return;
 
-    else if(superWrong())
+    else if(invalidFirstInput(text, exprLen))
         return;
 
-    else if(
-        isdigit(text[0]) || 
-        strcmp("%", text)==0 ||
-        strcmp("/", text)==0 ||
-        strcmp("x", text)==0 ||
-        strcmp("-", text)==0 ||
-        strcmp("+", text)==0 ||
-        strcmp(".", text)==0 ||
-        (
-            strcmp("-", text)==0 && 
-            exprLen==0
-        )
-    ){
-        if(text[0]=='.')
+    else if(backToBackDot(text))
+        return;
+    
+    else if(sameOperatorAgain(text, lastChar))
+        return;
+
+    else if(invalidOperation(text, exprLen, lastChar))
+        return;
+
+    else if(validOperatorOrOperand(text, exprLen)){
+        if(*(text)=='.')
             dot = 1;
-        if(isOperator(text[0]))
+        if(isOperator(*(text)))
             dot = 0;
         strncat(expr, text, 30-exprLen);
         showExpr();
     }
 
-    else if((strcmp("⌫", text)==0))
+    else if(backspaceClicked(text))
         backspace();
 
     else{
@@ -161,7 +172,7 @@ void handleButtonClick(GtkButton *button, gpointer user_data){
 void addButton(){
     const char *ops[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "%", "⌫", "/", "x", "-", "+", "=", "."};
     for(register unsigned short int i=0; i<19; ++i)
-        widget.button[i] = gtk_button_new_with_label(ops[i]);
+        widget.button[i] = gtk_button_new_with_label(*(ops+i));
 }
 
 void attachButton(){
