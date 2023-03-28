@@ -12,6 +12,7 @@ typedef struct operandNode{
 }nodeOperand;
 
 
+char prev = ' ';
 nodeOperator *topOperator = NULL;
 nodeOperand *topOperand = NULL;
 
@@ -38,6 +39,18 @@ unsigned short int isEmpty(char stackType){
     if((stackType=='r' && topOperator==NULL) || topOperand==NULL)
         return 1;
     return 0;
+}
+
+unsigned short int negativeOrDecimalNum(unsigned short int index, char ch){
+    return isdigit(ch) || ch=='.' || (ch=='-' && index==0) || (
+        ch=='-' &&
+        !isdigit(prev) && 
+        !isEmpty('r') && (
+            topOperator->data=='x' ||
+            topOperator->data=='/' ||
+            topOperator->data=='%'
+        )
+    );
 }
 
 void pushOperator(char ch){
@@ -95,19 +108,10 @@ void evaluate(char *expr){
     char ch, num[30];
     for(register unsigned short int i=0; *(expr+i)!='\0'; ++i){
         ch = *(expr+i);
-        if(
-            isdigit(ch) || 
-            ch == '.' ||
-            (ch == '-' && i == 0) || 
-            (ch == '-' && !isEmpty('r') && (topOperator->data == 'x' || topOperator->data == '/' || topOperator->data == '%'))
-        ){
+        if(negativeOrDecimalNum(i, ch)){
             memset(num, 0, sizeof(num));
-            while(
-                isdigit(ch) || 
-                ch == '.' ||
-                (ch == '-' && i == 0) ||
-                (ch == '-' && !isEmpty('r') && (topOperator->data == 'x' || topOperator->data == '/' || topOperator->data == '%'))
-            ){
+            while(negativeOrDecimalNum(i, ch)){
+                prev = ch;
                 strncat(num, &ch, 1);
                 i++;
                 if(i<strlen(expr)){
@@ -124,6 +128,7 @@ void evaluate(char *expr){
                 (precedence(ch)<=precedence(topOperator->data))
             )
                 pushOperand(infixEval());
+            prev = ch;
             pushOperator(ch);
         }
     }
