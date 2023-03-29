@@ -213,7 +213,7 @@ void activate(GtkApplication *app, gpointer user_data){
 
     box = gtk_entry_new();
     widget.grid = gtk_grid_new();
-    gtk_editable_set_editable(GTK_EDITABLE(box), TRUE);
+    gtk_editable_set_editable(GTK_EDITABLE(box), FALSE);
     gtk_container_add(GTK_CONTAINER(widget.window), widget.grid);
     
     addButton();
