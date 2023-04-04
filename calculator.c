@@ -82,35 +82,23 @@ unsigned short int invalidFirstInput(const gchar *text, char exprLen){
 
 unsigned short int invalidOperation(const gchar *text, char exprLen, char lastChar){
     return exprLen && (
-        lastChar=='+' && *(text)=='-' ||
-        lastChar=='+' && *(text)=='x' ||
-        lastChar=='+' && *(text)=='/' ||
-        lastChar=='+' && *(text)=='%' ||
-        lastChar=='-' && *(text)=='+' ||
-        lastChar=='-' && *(text)=='x' ||
-        lastChar=='-' && *(text)=='/' ||
-        lastChar=='-' && *(text)=='%' ||
-        lastChar=='x' && *(text)=='+' || 
-        lastChar=='x' && *(text)=='/' || 
-        lastChar=='x' && *(text)=='%' || 
-        lastChar=='/' && *(text)=='+' || 
-        lastChar=='/' && *(text)=='x' || 
-        lastChar=='/' && *(text)=='%' || 
-        lastChar=='%' && *(text)=='+' || 
-        lastChar=='%' && *(text)=='x' ||  
-        lastChar=='%' && *(text)=='/' ||   
-        lastChar=='%' && *(text)=='-'   
+        lastChar=='+' && (*(text)=='-' || *(text)=='x' || *(text)=='/' || *(text)=='%') ||
+        lastChar=='-' && (*(text)=='+' || *(text)=='x' || *(text)=='/' || *(text)=='%') ||
+        lastChar=='x' && (*(text)=='+' || *(text)=='/' || *(text)=='%') || 
+        lastChar=='/' && (*(text)=='+' || *(text)=='x' || *(text)=='%') || 
+        lastChar=='%' && (*(text)=='+' || *(text)=='x' ||  *(text)=='/' || *(text)=='-')   
     );
 }
 
 unsigned short int validOperatorOrOperand(const gchar *text, char exprLen){
-    return isdigit(*(text)) || 
+    return isdigit(*(text)) || (
         strcmp("%", text)==0 ||
         strcmp("/", text)==0 ||
         strcmp("x", text)==0 ||
         strcmp("-", text)==0 ||
         strcmp("+", text)==0 ||
-        strcmp(".", text)==0;
+        strcmp(".", text)==0
+    );
 }
 
 void compute(){
@@ -130,22 +118,14 @@ void handleButtonClick(GtkButton *button, gpointer user_data){
     if(clearClicked(text))
         clearExpr();
 
-    else if(superWrong())
-        return;
-
-    else if(checkStackSmash())
-        return;
-
-    else if(invalidFirstInput(text, exprLen))
-        return;
-
-    else if(backToBackDot(text))
-        return;
-    
-    else if(sameOperatorAgain(text, lastChar))
-        return;
-
-    else if(invalidOperation(text, exprLen, lastChar))
+    else if(
+        superWrong() || 
+        checkStackSmash() || 
+        invalidFirstInput(text, exprLen) || 
+        backToBackDot(text) || 
+        sameOperatorAgain(text, lastChar) ||
+        invalidOperation(text, exprLen, lastChar)
+    )
         return;
 
     else if(validOperatorOrOperand(text, exprLen)){
